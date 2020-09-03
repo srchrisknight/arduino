@@ -32,6 +32,7 @@ int desiredTemp = 134;
 //int currentTemp = 134;
 String desiredLine;
 String currentLine;
+long timeStamp = millis();
 /*********************************************************/
 void setup()
 {
@@ -60,7 +61,7 @@ void updateDesiredTemp(int incriment) {
   desiredTemp += incriment;
   lcd.setCursor ( 0, 1 );
   lcd.print(String("Desired: ") + String(desiredTemp) + "*     ");
-  delay(300);
+  delay(150);
 }
 
 void updateCurrentTemp(){
@@ -72,19 +73,25 @@ void loop()
 {
  //get current temp
  sensors.requestTemperatures();
- currentTemp = sensors.getTempCByIndex(0) * 1.8 + 32;
- Serial.println(currentTemp); 
+
+ if (abs(millis() - timeStamp) > 5000) {   
+   currentTemp = sensors.getTempCByIndex(0) * 1.8 + 32;
+   Serial.println(currentTemp); 
   
-  if (currentTemp < desiredTemp) {
-    lcd.setCursor ( 0, 3 );
-    lcd.print ("             Running");
-    digitalWrite(relayPin, HIGH);
-  } else {
-    lcd.setCursor ( 0, 3 );
-    lcd.print ("         Not Running");
-    digitalWrite(relayPin, LOW);
-  }
+    if (currentTemp < desiredTemp) {
+      lcd.setCursor ( 0, 3 );
+      lcd.print ("             Running");
+      digitalWrite(relayPin, HIGH);
+    } else {
+      lcd.setCursor ( 0, 3 );
+      lcd.print ("         Not Running");
+      digitalWrite(relayPin, LOW);
+    }
+
+
   updateCurrentTemp();
+  timeStamp = millis();
+}
 
   //increasebutton click
   increaseButtonState = digitalRead(increaseButtonPin);
