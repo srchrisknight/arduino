@@ -12,6 +12,16 @@
 // include the library code
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+
+#define ONE_WIRE_BUS 8
+
+#include <OneWire.h> 
+#include <DallasTemperature.h>
+
+OneWire oneWire(ONE_WIRE_BUS); 
+DallasTemperature sensors(&oneWire);
+float currentTemp = 0.0;
+
 LiquidCrystal_I2C lcd(0x27, 20, 4); // set the LCD address to 0x27 for a 16 chars and 2 line display
 const int relayPin = 7;
 const int increaseButtonPin = 4;
@@ -19,12 +29,15 @@ const int decreaseButtonPin = 2;
 int increaseButtonState = 0;
 int decreaseButtonState = 0;
 int desiredTemp = 134;
-int currentTemp = 134;
+//int currentTemp = 134;
 String desiredLine;
 String currentLine;
 /*********************************************************/
 void setup()
 {
+  Serial.begin(9600); 
+  sensors.begin();
+  
   pinMode(relayPin, OUTPUT);
   pinMode(decreaseButtonPin, INPUT);
   pinMode(increaseButtonPin, INPUT);
@@ -43,8 +56,25 @@ void setup()
   //  lcd.print("             Running");
 }
 /*********************************************************/
+void updateDesiredTemp(int incriment) {
+  desiredTemp += incriment;
+  lcd.setCursor ( 0, 1 );
+  lcd.print(String("Desired: ") + String(desiredTemp) + "*     ");
+  delay(300);
+}
+
+void updateCurrentTemp(){
+ lcd.setCursor(0,0);
+ lcd.print("Current: " + String(int(currentTemp)) +"*     "); 
+}
+
 void loop()
 {
+ //get current temp
+ sensors.requestTemperatures();
+ currentTemp = sensors.getTempCByIndex(0) * 1.8 + 32;
+ Serial.println(currentTemp); 
+  
   if (currentTemp < desiredTemp) {
     lcd.setCursor ( 0, 3 );
     lcd.print ("             Running");
@@ -54,6 +84,7 @@ void loop()
     lcd.print ("         Not Running");
     digitalWrite(relayPin, LOW);
   }
+  updateCurrentTemp();
 
   //increasebutton click
   increaseButtonState = digitalRead(increaseButtonPin);
@@ -69,10 +100,5 @@ void loop()
 
 }
 /************************************************************/
-void updateDesiredTemp(int incriment) {
-  desiredTemp += incriment;
-  lcd.setCursor ( 0, 1 );
-  lcd.print("Desired: " + String(desiredTemp) + "*");
-  delay(300);
-}
+
 /************************************************************/
