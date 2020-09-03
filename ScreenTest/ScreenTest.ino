@@ -71,27 +71,25 @@ void updateCurrentTemp(){
 
 void loop()
 {
- //get current temp
- sensors.requestTemperatures();
-
- if (abs(millis() - timeStamp) > 5000) {   
+  
+ if (abs(millis() - timeStamp) > 5000) {  
+   sensors.requestTemperatures(); 
    currentTemp = sensors.getTempCByIndex(0) * 1.8 + 32;
    Serial.println(currentTemp); 
   
-    if (currentTemp < desiredTemp) {
-      lcd.setCursor ( 0, 3 );
-      lcd.print ("             Running");
-      digitalWrite(relayPin, HIGH);
-    } else {
-      lcd.setCursor ( 0, 3 );
-      lcd.print ("         Not Running");
-      digitalWrite(relayPin, LOW);
-    }
-
+   if (currentTemp < desiredTemp) {
+     lcd.setCursor ( 0, 3 );
+     lcd.print ("             Running");
+     digitalWrite(relayPin, HIGH);
+   } else {
+     lcd.setCursor ( 0, 3 );
+     lcd.print ("         Not Running");
+     digitalWrite(relayPin, LOW);
+   }
 
   updateCurrentTemp();
   timeStamp = millis();
-}
+ }
 
   //increasebutton click
   increaseButtonState = digitalRead(increaseButtonPin);
