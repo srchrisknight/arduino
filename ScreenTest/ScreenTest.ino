@@ -61,7 +61,7 @@ void updateDesiredTemp(int incriment) {
   desiredTemp += incriment;
   lcd.setCursor ( 0, 1 );
   lcd.print(String("Desired: ") + String(desiredTemp) + "*     ");
-  delay(150);
+  delay(200);
 }
 
 void updateCurrentTemp(){
